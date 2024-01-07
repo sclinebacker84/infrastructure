@@ -1,6 +1,4 @@
 keys/
 .env
 terraform/.terraform*
-terraform/backend.tf
 terraform/*.tfstate
-packer/main.pkr.hcl

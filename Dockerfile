@@ -1,17 +1,13 @@
-FROM alpine:3.19.0
-RUN apk add envsubst
-#terraform
-ADD https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip terraform.zip
-RUN unzip terraform.zip -d /bin && rm terraform.zip
-#packer
-ADD https://releases.hashicorp.com/packer/1.10.0/packer_1.10.0_linux_amd64.zip packer.zip
-RUN unzip packer.zip -d /bin && rm packer.zip
+ARG IMAGE
+FROM $IMAGE
+#prereqs and binaries
+ARG TERRAFORM_URL
+ARG PACKER_URL
+ADD $TERRAFORM_URL terraform.zip
+ADD $PACKER_URL packer.zip
+RUN apk add envsubst; for a in 'terraform' 'packer'; do unzip $a.zip -d /bin; rm $a.zip; done
 #src code and config
-COPY terraform/ /terraform/
-COPY packer/ /packer/
-COPY keys/ /keys/
-COPY .env .env
-RUN export $(cat .env | xargs) && cat terraform/backend.tf.template | envsubst > terraform/backend.tf && cat packer/main.pkr.hcl.template | envsubst > packer/main.pkr.hcl
-RUN mkdir -p ~/.aws && echo -e "[default]\naws_access_key_id=${TF_VAR_access_key}\naws_secret_access_key=${TF_VAR_secret_key}" > ~/.aws/credentials
+COPY . .
+RUN echo 'export $(cat /.env | xargs)' >> /etc/profile && chmod +x ./config.sh && ./config.sh
 WORKDIR /terraform
-RUN terraform init
+RUN terraform init -backend-config=/root/backend.conf

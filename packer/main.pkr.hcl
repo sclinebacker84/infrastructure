@@ -1,8 +1,12 @@
-variable compartment_ocid {
+variable az {
   type = string
 }
 
-variable subnet_ocid {
+variable group {
+  type = string
+}
+
+variable subnet {
   type = string
 }
 
@@ -10,19 +14,16 @@ variable image_name {
   type = string
 }
 
+variable ssh_username {
+  type = string
+}
+
 variable num_cores {
   type = number
-  default = 2
 }
 
 variable instance_type {
   type = string
-  default = "VM.Standard.A1.Flex"
-}
-
-variable ssh_username {
-  type = string
-  default = "opc"
 }
 
 packer {
@@ -35,25 +36,26 @@ packer {
 }
 
 source "oracle-oci" "main" {
-  availability_domain = "${PKR_VAR_availability_domain}"
-  base_image_ocid     = "${PKR_VAR_base_image_ocid}"
-  compartment_ocid    = var.compartment_ocid
+  availability_domain = var.az
+  compartment_ocid    = var.group
+  subnet_ocid         = var.subnet
   image_name          = var.image_name
   shape               = var.instance_type
   shape_config {
     ocpus = var.num_cores
   }
+  base_image_filter {
+    display_name_search = "Oracle-Linux-8*"
+  }
   ssh_username        = var.ssh_username
-  subnet_ocid         = var.subnet_ocid
-  tenancy_ocid = "${TF_VAR_tenancy_ocid}"
-  user_ocid    = "${TF_VAR_user_ocid}"
-  key_file     = "${TF_VAR_private_key_path}"
-  fingerprint  = "${TF_VAR_fingerprint}"
-  region       = "${TF_VAR_region}"
 }
 
 build {
   sources = ["source.oracle-oci.main"]
+  provisioner "file" {
+    source = "../.env"
+    destination = "~/.env"
+  }
   provisioner "shell" {
     script = "../packer/install.sh"
   }

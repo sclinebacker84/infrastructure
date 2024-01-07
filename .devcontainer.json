@@ -1,5 +1,5 @@
 {
     "image": "infrastructure",
-    "runArgs": ["--rm","--name","infrastructure","--env-file",".env"],
-    "postStartCommand": "export $(cat .env | xargs) && cat terraform/backend.tf.template | envsubst > terraform/backend.tf && cat packer/main.pkr.hcl.template | envsubst > packer/main.pkr.hcl && cd terraform && terraform init -reconfigure"
+    "runArgs": ["--rm","--name","infrastructure"],
+    "postStartCommand": "cd terraform && terraform init -reconfigure -backend-config=/root/backend.conf"
 }

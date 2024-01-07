@@ -1,4 +1,7 @@
-dnf install -y dnf-utils zip unzip
-dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
-dnf remove -y runc
-dnf install -y docker-ce --nobest
+sudo dnf install -y dnf-utils zip unzip
+sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+sudo dnf remove -y runc
+sudo dnf install -y docker-ce --nobest
+#set env variables
+export $(cat ~/.env | xargs)
+env
