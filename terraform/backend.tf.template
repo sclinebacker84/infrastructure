@@ -1,0 +1,14 @@
+terraform {
+  backend "s3" {
+    bucket = "${TF_VAR_terraform_bucket}"
+    region = "${TF_VAR_region}"
+    key = "tf.tfstate"
+    skip_region_validation      = true
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    force_path_style            = true
+    access_key = "${TF_VAR_access_key}"
+    secret_key = "${TF_VAR_secret_key}"
+    endpoint = "https://${TF_VAR_object_storage_namespace}.compat.objectstorage.${TF_VAR_region}.oraclecloud.com"
+  }
+}
